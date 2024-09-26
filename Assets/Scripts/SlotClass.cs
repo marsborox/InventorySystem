@@ -21,4 +21,5 @@ public class SlotClass
     public ItemClass GetItem () { return _item; }
     public int GetQuantity () { return _quantity;}
     public void AddQuantity(int quantity) { _quantity += quantity; }
+    public void SubQuantity(int quantity) { _quantity -= quantity; }
 }
