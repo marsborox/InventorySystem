@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-
 using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,23 +11,33 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private ItemClass _itemToRemove;
 
     //public List <ItemClass> items = new List<ItemClass> ();
-    //public List<SlotClass> _items = new List<SlotClass>();
-    public List<SlotClass> items = new List<SlotClass>();
-    //public List<ItemClass> itemss = new List<ItemClass>();
+
+    //public List<SlotClass> items = new List<SlotClass>();
+    //
+    public SlotClass[] items;
+
+
     //this array keep track of slots
     private GameObject[] _slots;
     private void Start()
     {
         _slots = new GameObject[_slotHolder.transform.childCount];
+        items = new SlotClass[_slots.Length];
         //set all the slots
+        for (int i = 0; i < items.Length; i++)
+        {
+            items[i]=new SlotClass();
+        }
+
         for (int i = 0; i < _slotHolder.transform.childCount; i++)
         {
             _slots[i]=_slotHolder.transform.GetChild(i).gameObject;
         }
+
         RefreshUI();
         //just for testing
         Add(_itemToAdd);
-        Remove(_itemToRemove);
+        
         Add(_itemToAdd);
         Add(_itemToAdd);
         Add(_itemToAdd);
@@ -72,10 +80,10 @@ public class InventoryManager : MonoBehaviour
             slot.AddQuantity(1);
         }
         else
-        {
-            if (items.Count < _slots.Length)
+        {   for (int i=0; i< items.Length; i++) 
+            if (items[i].GetItem()==null)//this is empty slot
             {
-                items.Add(new SlotClass(item, 1));
+                    items[i].AddItem(item,1);
             }
             else { return false; }
         }
@@ -83,48 +91,61 @@ public class InventoryManager : MonoBehaviour
         return true;//yes we succesfully added the item
     }
 
-    public bool Remove(ItemClass item)
-    {
-        SlotClass temp = Contains(item);
-        if (temp != null)
-        {//if yes we add +1
-            if (temp.GetQuantity() > 1)
-            {//if we have more of this item in inventory
-                temp.SubQuantity(1);
-            }
-            else 
-            {//we have just one item in inventory
-                //items.Remove(item);
-                SlotClass slotToRemove = new SlotClass();
-                foreach (SlotClass slot in items)
-                {
-                    if (slot.GetItem() == item)
-                    {
-                        slotToRemove = slot;
-                        break;
-                    }
-                }
-                items.Remove(slotToRemove);
-            }
-        }
-        else
-        {//if we dont have that item in inventory
-            return false;
-        }
-        
-        RefreshUI();
-        return true;
-    }
     public SlotClass Contains(ItemClass item)
     {
-        foreach (SlotClass slot in items)
-        { 
-            if (slot.GetItem() == item)
-                return slot;
+        for (int  i=0; i< items.Length;i++) 
+        {
+            if (items[i].GetItem() == item)
+                return items[i];
         }
         return null;
     }
+    /*
+        public bool Remove(ItemClass item)
+        {
+            SlotClass temp = Contains(item);
+            if (temp != null)
+            {//if yes we add +1
+                if (temp.GetQuantity() > 1)
+                {//if we have more of this item in inventory
+                    temp.SubQuantity(1);
+                }
+                else 
+                {//we have just one item in inventory
+                    //items.Remove(item);
+                    SlotClass slotToRemove = new SlotClass();
+                    foreach (SlotClass slot in items)
+                    {
+                        if (slot.GetItem() == item)
+                        {
+                            slotToRemove = slot;
+                            break;
+                        }
+                    }
+                    items.Remove(slotToRemove);
+                }
+            }
+            else
+            {//if we dont have that item in inventory
+                return false;
+            }
 
+            RefreshUI();
+            return true;
+        }
+    */
+    /*
+        public SlotClass Contains(ItemClass item)
+        {
+            foreach (SlotClass slot in items)
+            { 
+                if (slot.GetItem() == item)
+                    return slot;
+            }
+            return null;
+        }
+    */
+    /*
     void TestStartMethods()
     {
         //just for testing, was in start
@@ -132,10 +153,11 @@ public class InventoryManager : MonoBehaviour
         Add(_itemToAdd);
         Remove(_itemToRemove);
     }
+    */
 }
 
 
-/* this should have sticke size
+/* this should have stick size
  * public SlotClass Contains(ItemClass item)
     {
         foreach(SlotClass slot in Items)
@@ -146,3 +168,27 @@ public class InventoryManager : MonoBehaviour
         return null;
     }
 */
+
+/* this is method used when we used List
+ public bool Add(ItemClass item)
+    {
+        //items.Add (item);
+        //check if invenotry contains item
+        SlotClass slot = Contains(item);
+        if (slot != null&&slot.GetItem().isStackable)
+        {//if yes we add +1
+            slot.AddQuantity(1);
+        }
+        else
+        {
+            if (items.Count < _slots.Length)
+            {
+                items.Add(new SlotClass(item, 1));
+            }
+            else { return false; }
+        }
+        RefreshUI();
+        return true;//yes we succesfully added the item
+    }
+  
+ */

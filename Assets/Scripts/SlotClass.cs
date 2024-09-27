@@ -22,4 +22,9 @@ public class SlotClass
     public int GetQuantity () { return _quantity;}
     public void AddQuantity(int quantity) { _quantity += quantity; }
     public void SubQuantity(int quantity) { _quantity -= quantity; }
+    public void AddItem(ItemClass item, int quantity) 
+    {
+        this._item= item;
+        this._quantity= quantity;
+    }
 }
