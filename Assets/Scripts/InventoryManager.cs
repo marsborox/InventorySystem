@@ -14,7 +14,9 @@ public class InventoryManager : MonoBehaviour
 
     //public List<SlotClass> items = new List<SlotClass>();
     //
-    public SlotClass[] items;
+    [SerializeField] private SlotClass[] _startingItems;//if we want to start with items instead of methods
+
+    private SlotClass[] _items;
 
 
     //this array keep track of slots
@@ -22,26 +24,35 @@ public class InventoryManager : MonoBehaviour
     private void Start()
     {
         _slots = new GameObject[_slotHolder.transform.childCount];
-        items = new SlotClass[_slots.Length];
-        //set all the slots
-        for (int i = 0; i < items.Length; i++)
-        {
-            items[i]=new SlotClass();
-        }
+        _items = new SlotClass[_slots.Length];
+        
 
+
+        //set all the slots
+        //this is if we dont want starting items explicitly
+
+        //initialise slots
+        for (int i = 0; i < _items.Length; i++)
+        {
+            _items[i]=new SlotClass();
+        }
+        //starting items into inventory
+        for (int i = 0; i < _startingItems.Length; i++)
+        {
+            _items[i] = _startingItems[i];
+        }
+        //set all slots
         for (int i = 0; i < _slotHolder.transform.childCount; i++)
         {
             _slots[i]=_slotHolder.transform.GetChild(i).gameObject;
         }
 
         RefreshUI();
+
+
         //just for testing
         Add(_itemToAdd);
-        
-        Add(_itemToAdd);
-        Add(_itemToAdd);
-        Add(_itemToAdd);
-        Add(_itemToAdd);
+        Remove(_itemToRemove);
     }
     public void RefreshUI()
     { //will get through inventory and check if its in inventory, if yes image is put int
@@ -52,10 +63,10 @@ public class InventoryManager : MonoBehaviour
                 //everytime child is image
                 //child on position 0 i guess; it will set sprite as item icon
                 _slots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
-                _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i].GetItem().itemIcon;
-                if (items[i].GetItem().isStackable)
+                _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = _items[i].GetItem().itemIcon;
+                if (_items[i].GetItem().isStackable)
                 {
-                    _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = items[i].GetQuantity() + "";//***************
+                    _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = _items[i].GetQuantity() + "";//***************
                 }
                 else { _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = ""; }
                 // this was above he changed it for some reason _slots[i].transform.GetChild(1).GetComponent<Text>().text = _items[i].GetQuantity().ToString();
@@ -80,23 +91,61 @@ public class InventoryManager : MonoBehaviour
             slot.AddQuantity(1);
         }
         else
-        {   for (int i=0; i< items.Length; i++) 
-            if (items[i].GetItem()==null)//this is empty slot
+        {//check whole array
+            for (int i = 0; i < _items.Length; i++)
             {
-                    items[i].AddItem(item,1);
+                if (_items[i].GetItem() == null)//this is empty slot
+                {
+                    _items[i].AddItem(item, 1);
+                    break;
+                }
             }
-            else { return false; }
+            
         }
         RefreshUI();
         return true;//yes we succesfully added the item
     }
-
-    public SlotClass Contains(ItemClass item)
+    public bool Remove(ItemClass item)
     {
-        for (int  i=0; i< items.Length;i++) 
+        SlotClass temp = Contains(item);
+        if (temp != null)
+        {//if yes we add +1
+            if (temp.GetQuantity() > 1)
+            {//if we have more of this item in inventory
+                temp.SubQuantity(1);
+                //Debug.Log("item removed");
+            }
+            else
+            {
+                int slotToRemoveIndex = 0;
+                for (int i=0; i<_items.Length;i++)
+                {
+                    if (_items[i].GetItem()==item)
+                    {
+                        slotToRemoveIndex = i;
+                        break;
+                    }
+                }
+                _items[slotToRemoveIndex].Clear();
+            }
+        }
+        else
+        {//if we dont have that item in inventory
+            return false;
+        }
+        RefreshUI();
+        return true;
+    }
+
+        public SlotClass Contains(ItemClass item)
+    {
+        for (int  i=0; i < _items.Length;i++) 
         {
-            if (items[i].GetItem() == item)
-                return items[i];
+            //Debug.Log(_items[i]);
+            if (_items[i].GetItem() == item)
+            { 
+                return _items[i]; 
+            }
         }
         return null;
     }
@@ -134,27 +183,27 @@ public class InventoryManager : MonoBehaviour
             return true;
         }
     */
-    /*
-        public SlotClass Contains(ItemClass item)
-        {
-            foreach (SlotClass slot in items)
-            { 
-                if (slot.GetItem() == item)
-                    return slot;
+        /*
+            public SlotClass Contains(ItemClass item)
+            {
+                foreach (SlotClass slot in items)
+                { 
+                    if (slot.GetItem() == item)
+                        return slot;
+                }
+                return null;
             }
-            return null;
-        }
-    */
-    /*
-    void TestStartMethods()
-    {
-        //just for testing, was in start
+        */
+        /*
+        void TestStartMethods()
+        {
+            //just for testing, was in start
 
-        Add(_itemToAdd);
-        Remove(_itemToRemove);
+            Add(_itemToAdd);
+            Remove(_itemToRemove);
+        }
+        */
     }
-    */
-}
 
 
 /* this should have stick size

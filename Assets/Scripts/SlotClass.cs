@@ -18,6 +18,12 @@ public class SlotClass
         this._item = item;
         this._quantity = quantity;
     }
+    public void Clear()
+    {
+        this._item = null;
+        this._quantity = 0;
+    
+    }
     public ItemClass GetItem () { return _item; }
     public int GetQuantity () { return _quantity;}
     public void AddQuantity(int quantity) { _quantity += quantity; }
