@@ -7,17 +7,26 @@ public class SlotClass
 {
     [SerializeField] private ItemClass _item;
     [SerializeField] private int _quantity;
+    private SlotClass slotClass;
 
     public SlotClass()
     {
         _item = null;
         _quantity = 0;
     }
+
     public SlotClass (ItemClass item, int quantity)
     {
         this._item = item;
         this._quantity = quantity;
     }
+
+    public SlotClass(SlotClass slotClass)
+    {//he didnt added it but to fix bug should work
+        this.slotClass = slotClass;
+        this._quantity= slotClass._quantity;
+    }
+
     public void Clear()
     {
         this._item = null;

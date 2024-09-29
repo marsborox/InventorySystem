@@ -946,16 +946,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _slotHolder: {fileID: 1706305138}
   _itemToAdd: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
-  _itemToRemove: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
-  items:
-  - _item: {fileID: 11400000, guid: 1a9a8d8f871d32045955b4fd33d9237a, type: 2}
-    _quantity: 2
-  - _item: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
-    _quantity: 1
+  _itemToRemove: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
+  _startingItems:
   - _item: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
-    _quantity: 5
+    _quantity: 4
+  - _item: {fileID: 11400000, guid: 1a9a8d8f871d32045955b4fd33d9237a, type: 2}
+    _quantity: 4
   - _item: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
-    _quantity: 1
+    _quantity: 2
 --- !u!1001 &665526304
 PrefabInstance:
   m_ObjectHideFlags: 0

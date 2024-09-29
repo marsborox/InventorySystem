@@ -21,6 +21,14 @@ public class InventoryManager : MonoBehaviour
 
     //this array keep track of slots
     private GameObject[] _slots;
+
+    private SlotClass _movingSlot;
+    private SlotClass _tempSlot;
+    private SlotClass _originalSlot;
+
+    bool isMovingItem;
+
+
     private void Start()
     {
         _slots = new GameObject[_slotHolder.transform.childCount];
@@ -54,6 +62,25 @@ public class InventoryManager : MonoBehaviour
         Add(_itemToAdd);
         Remove(_itemToRemove);
     }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))//we clicked down
+        { //find closest slot - could be done as Onclick event on slot
+            Debug.Log(GetClosestSlot().GetItem());
+
+            if (isMovingItem)
+            {
+                EndItemMove();
+            //endItemMove
+            }
+            else
+            {
+                BeginItemMove();
+            }
+        }
+    }
+    #region Inventory Utilities
     public void RefreshUI()
     { //will get through inventory and check if its in inventory, if yes image is put int
         for (int i=0; i< _slots.Length;i++) 
@@ -149,61 +176,116 @@ public class InventoryManager : MonoBehaviour
         }
         return null;
     }
-    /*
-        public bool Remove(ItemClass item)
-        {
-            SlotClass temp = Contains(item);
-            if (temp != null)
-            {//if yes we add +1
-                if (temp.GetQuantity() > 1)
-                {//if we have more of this item in inventory
-                    temp.SubQuantity(1);
-                }
-                else 
-                {//we have just one item in inventory
-                    //items.Remove(item);
-                    SlotClass slotToRemove = new SlotClass();
-                    foreach (SlotClass slot in items)
-                    {
-                        if (slot.GetItem() == item)
-                        {
-                            slotToRemove = slot;
-                            break;
-                        }
-                    }
-                    items.Remove(slotToRemove);
-                }
-            }
-            else
-            {//if we dont have that item in inventory
-                return false;
-            }
+    #endregion Inventory Utilities 
 
+    #region Moving Stuff
+    private bool BeginItemMove()
+    {
+        //_originalSlot = new SlotClass(GetClosestSlot());
+        _originalSlot = GetClosestSlot();
+        if (_originalSlot == null || _originalSlot.GetItem() == null)
+            return false;//no item to move
+       
+        
+            _movingSlot = new SlotClass(_originalSlot);
+            _originalSlot.Clear();
+            isMovingItem = true;
             RefreshUI();
             return true;
-        }
-    */
-        /*
-            public SlotClass Contains(ItemClass item)
-            {
-                foreach (SlotClass slot in items)
-                { 
-                    if (slot.GetItem() == item)
-                        return slot;
-                }
-                return null;
-            }
-        */
-        /*
-        void TestStartMethods()
-        {
-            //just for testing, was in start
-
-            Add(_itemToAdd);
-            Remove(_itemToRemove);
-        }
-        */
+        
     }
+    private bool EndItemMove() 
+    {
+        _originalSlot=GetClosestSlot();
+        if (_originalSlot.GetItem() != null)
+        {//if item is already existing there
+            if (_originalSlot.GetItem() == _movingSlot.GetItem()) //they are same item they should stack
+            {//if they are same stack
+                
+            }
+            else
+            {//they not same swap
+
+            }
+        }
+        else
+        { 
+            //place as usual
+            _originalSlot.AddItem(_movingSlot.GetItem(),_movingSlot.GetQuantity());
+            _movingSlot.Clear();
+        }
+        RefreshUI();
+        return true;
+    }
+    private SlotClass GetClosestSlot()
+    {//find cursor position
+        Debug.Log(Input.mousePosition);
+        //should be in relation in canvas
+        for (int i = 0; i < _slots.Length; i++)
+        {
+            if (Vector2.Distance(_slots[i].transform.position, Input.mousePosition) <= 32)
+                return _items[i];
+        }
+        return null;
+    }
+
+
+    #endregion
+}
+/*
+    public bool Remove(ItemClass item)
+    {
+        SlotClass temp = Contains(item);
+        if (temp != null)
+        {//if yes we add +1
+            if (temp.GetQuantity() > 1)
+            {//if we have more of this item in inventory
+                temp.SubQuantity(1);
+            }
+            else 
+            {//we have just one item in inventory
+                //items.Remove(item);
+                SlotClass slotToRemove = new SlotClass();
+                foreach (SlotClass slot in items)
+                {
+                    if (slot.GetItem() == item)
+                    {
+                        slotToRemove = slot;
+                        break;
+                    }
+                }
+                items.Remove(slotToRemove);
+            }
+        }
+        else
+        {//if we dont have that item in inventory
+            return false;
+        }
+
+        RefreshUI();
+        return true;
+    }
+*/
+/*
+    public SlotClass Contains(ItemClass item)
+    {
+        foreach (SlotClass slot in items)
+        { 
+            if (slot.GetItem() == item)
+                return slot;
+        }
+        return null;
+    }
+*/
+/*
+void TestStartMethods()
+{
+    //just for testing, was in start
+
+    Add(_itemToAdd);
+    Remove(_itemToRemove);
+}
+*/
 
 
 /* this should have stick size
