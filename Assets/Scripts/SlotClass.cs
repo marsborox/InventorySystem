@@ -23,7 +23,7 @@ public class SlotClass
 
     public SlotClass(SlotClass slotClass)
     {//he didnt added it but to fix bug should work
-        this.slotClass = slotClass;
+        this._item = slotClass._item;
         this._quantity= slotClass._quantity;
     }
 

@@ -22,11 +22,12 @@ public class InventoryManager : MonoBehaviour
     //this array keep track of slots
     private GameObject[] _slots;
 
-    private SlotClass _movingSlot;
-    private SlotClass _tempSlot;
-    private SlotClass _originalSlot;
+    //SF only for torubleshooting
+    [SerializeField] private SlotClass _movingSlot;
+    [SerializeField] private SlotClass _tempSlot;
+    [SerializeField] private SlotClass _originalSlot;
 
-    bool isMovingItem;
+    [SerializeField] bool isMovingItem;
 
 
     private void Start()
@@ -59,7 +60,7 @@ public class InventoryManager : MonoBehaviour
 
 
         //just for testing
-        Add(_itemToAdd);
+        Add(_itemToAdd,1);
         Remove(_itemToRemove);
     }
 
@@ -108,7 +109,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public bool Add(ItemClass item)
+    public bool Add(ItemClass item, int quantity)
     {
         //items.Add (item);
         //check if invenotry contains item
@@ -123,7 +124,7 @@ public class InventoryManager : MonoBehaviour
             {
                 if (_items[i].GetItem() == null)//this is empty slot
                 {
-                    _items[i].AddItem(item, 1);
+                    _items[i].AddItem(item, quantity);
                     break;
                 }
             }
@@ -197,23 +198,42 @@ public class InventoryManager : MonoBehaviour
     private bool EndItemMove() 
     {
         _originalSlot=GetClosestSlot();
-        if (_originalSlot.GetItem() != null)
-        {//if item is already existing there
-            if (_originalSlot.GetItem() == _movingSlot.GetItem()) //they are same item they should stack
-            {//if they are same stack
-                
-            }
-            else
-            {//they not same swap
 
-            }
-        }
-        else
-        { 
-            //place as usual
-            _originalSlot.AddItem(_movingSlot.GetItem(),_movingSlot.GetQuantity());
+        if (_originalSlot == null)
+        {
+            Add(_movingSlot.GetItem(), _movingSlot.GetQuantity());
             _movingSlot.Clear();
         }
+        else
+        {
+            if (_originalSlot.GetItem() != null)
+            {//if item is already existing there
+                if (_originalSlot.GetItem() == _movingSlot.GetItem()) //they are same item they should stack
+                {//if they are same stack
+                    if (_originalSlot.GetItem().isStackable)
+                    {
+                        _originalSlot.AddQuantity(_movingSlot.GetQuantity());
+                        _movingSlot.Clear();
+                    }
+                    else { return false; }
+                }
+                else
+                {//they not same item - we will swap
+                    _tempSlot = new SlotClass(_originalSlot);
+                    _originalSlot.AddItem(_movingSlot.GetItem(), _movingSlot.GetQuantity());
+                    _movingSlot.AddItem(_tempSlot.GetItem(), _tempSlot.GetQuantity());
+                    RefreshUI();
+                    return true;
+                }
+            }
+            else
+            {
+                //place as usual
+                _originalSlot.AddItem(_movingSlot.GetItem(), _movingSlot.GetQuantity());
+                _movingSlot.Clear();
+            }
+        }
+        isMovingItem=false;
         RefreshUI();
         return true;
     }
