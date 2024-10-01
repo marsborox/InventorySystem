@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 public abstract class ItemClass : ScriptableObject
-{
+{//abstract class
     //data shared across every item
     [Header("Item")]
     public string itemName;

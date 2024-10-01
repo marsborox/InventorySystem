@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
+    [SerializeField] private GameObject _itemCursor;
     [SerializeField] private GameObject _slotHolder;
     [SerializeField] private ItemClass _itemToAdd;
     [SerializeField] private ItemClass _itemToRemove;
@@ -66,9 +67,20 @@ public class InventoryManager : MonoBehaviour
 
     private void Update()
     {
+#region have item visible when moving
+
+        _itemCursor.SetActive(isMovingItem);
+        _itemCursor.transform.position=Input.mousePosition;
+        if (isMovingItem)
+        {
+            _itemCursor.GetComponent<Image>().sprite = _movingSlot.GetItem().itemIcon;
+        }
+#endregion
         if (Input.GetMouseButtonDown(0))//we clicked down
         { //find closest slot - could be done as Onclick event on slot
-            Debug.Log(GetClosestSlot().GetItem());
+            //cant use this debug will cause null reference and wont work
+            //when clicked not on slot while moving
+            //Debug.Log(GetClosestSlot().GetItem());
 
             if (isMovingItem)
             {
@@ -200,7 +212,7 @@ public class InventoryManager : MonoBehaviour
         _originalSlot=GetClosestSlot();
 
         if (_originalSlot == null)
-        {
+        {//if we are moving item but click not on slot return item to original slot
             Add(_movingSlot.GetItem(), _movingSlot.GetQuantity());
             _movingSlot.Clear();
         }
@@ -209,7 +221,7 @@ public class InventoryManager : MonoBehaviour
             if (_originalSlot.GetItem() != null)
             {//if item is already existing there
                 if (_originalSlot.GetItem() == _movingSlot.GetItem()) //they are same item they should stack
-                {//if they are same stack
+                {//if they are same stack combine them
                     if (_originalSlot.GetItem().isStackable)
                     {
                         _originalSlot.AddQuantity(_movingSlot.GetQuantity());
@@ -252,94 +264,4 @@ public class InventoryManager : MonoBehaviour
 
     #endregion
 }
-/*
-    public bool Remove(ItemClass item)
-    {
-        SlotClass temp = Contains(item);
-        if (temp != null)
-        {//if yes we add +1
-            if (temp.GetQuantity() > 1)
-            {//if we have more of this item in inventory
-                temp.SubQuantity(1);
-            }
-            else 
-            {//we have just one item in inventory
-                //items.Remove(item);
-                SlotClass slotToRemove = new SlotClass();
-                foreach (SlotClass slot in items)
-                {
-                    if (slot.GetItem() == item)
-                    {
-                        slotToRemove = slot;
-                        break;
-                    }
-                }
-                items.Remove(slotToRemove);
-            }
-        }
-        else
-        {//if we dont have that item in inventory
-            return false;
-        }
 
-        RefreshUI();
-        return true;
-    }
-*/
-/*
-    public SlotClass Contains(ItemClass item)
-    {
-        foreach (SlotClass slot in items)
-        { 
-            if (slot.GetItem() == item)
-                return slot;
-        }
-        return null;
-    }
-*/
-/*
-void TestStartMethods()
-{
-    //just for testing, was in start
-
-    Add(_itemToAdd);
-    Remove(_itemToRemove);
-}
-*/
-
-
-/* this should have stick size
- * public SlotClass Contains(ItemClass item)
-    {
-        foreach(SlotClass slot in Items)
-        {
-            if (slot.GetItem() == item && slot.GetItem().stackSize > slot.GetQuantity())
-                return slot;
-        }
-        return null;
-    }
-*/
-
-/* this is method used when we used List
- public bool Add(ItemClass item)
-    {
-        //items.Add (item);
-        //check if invenotry contains item
-        SlotClass slot = Contains(item);
-        if (slot != null&&slot.GetItem().isStackable)
-        {//if yes we add +1
-            slot.AddQuantity(1);
-        }
-        else
-        {
-            if (items.Count < _slots.Length)
-            {
-                items.Add(new SlotClass(item, 1));
-            }
-            else { return false; }
-        }
-        RefreshUI();
-        return true;//yes we succesfully added the item
-    }
-  
- */

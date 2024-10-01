@@ -944,16 +944,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 995a656e93d69754c84f855821970f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _itemCursor: {fileID: 707082708}
   _slotHolder: {fileID: 1706305138}
   _itemToAdd: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
   _itemToRemove: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
   _startingItems:
   - _item: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
     _quantity: 4
-  - _item: {fileID: 11400000, guid: 1a9a8d8f871d32045955b4fd33d9237a, type: 2}
+  - _item: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
     _quantity: 4
   - _item: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
     _quantity: 2
+  _movingSlot:
+    _item: {fileID: 0}
+    _quantity: 0
+  _tempSlot:
+    _item: {fileID: 0}
+    _quantity: 0
+  _originalSlot:
+    _item: {fileID: 0}
+    _quantity: 0
+  isMovingItem: 0
 --- !u!1001 &665526304
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1068,7 +1079,7 @@ GameObject:
   - component: {fileID: 707082711}
   - component: {fileID: 707082710}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Cursor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1106,7 +1117,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
