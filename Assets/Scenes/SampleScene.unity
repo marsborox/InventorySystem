@@ -949,21 +949,21 @@ MonoBehaviour:
   _itemToAdd: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
   _itemToRemove: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
   _startingItems:
-  - _item: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
-    _quantity: 4
-  - _item: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
-    _quantity: 4
-  - _item: {fileID: 11400000, guid: 5491ddfdd401b504ba20a4b07192ec2b, type: 2}
-    _quantity: 2
+  - <item>k__BackingField: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
+    <quantity>k__BackingField: 10
+  - <item>k__BackingField: {fileID: 11400000, guid: 1a9a8d8f871d32045955b4fd33d9237a, type: 2}
+    <quantity>k__BackingField: 5
+  - <item>k__BackingField: {fileID: 0}
+    <quantity>k__BackingField: 0
   _movingSlot:
-    _item: {fileID: 0}
-    _quantity: 0
+    <item>k__BackingField: {fileID: 0}
+    <quantity>k__BackingField: 0
   _tempSlot:
-    _item: {fileID: 0}
-    _quantity: 0
+    <item>k__BackingField: {fileID: 0}
+    <quantity>k__BackingField: 0
   _originalSlot:
-    _item: {fileID: 0}
-    _quantity: 0
+    <item>k__BackingField: {fileID: 0}
+    <quantity>k__BackingField: 0
   isMovingItem: 0
 --- !u!1001 &665526304
 PrefabInstance:

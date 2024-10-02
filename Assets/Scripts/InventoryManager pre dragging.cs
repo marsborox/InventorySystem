@@ -50,10 +50,10 @@ public class InventoryManagerpredragging : MonoBehaviour
                 //everytime child is image
                 //child on position 0 i guess; it will set sprite as item icon
                 _slots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
-                _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i].GetItem().itemIcon;
-                if (items[i].GetItem().isStackable)
+                _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i].item.itemIcon;
+                if (items[i].item.isStackable)
                 {
-                    _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = items[i].GetQuantity() + "";//***************
+                    _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = items[i].quantity + "";//***************
                 }
                 else { _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = ""; }
                 // this was above he changed it for some reason _slots[i].transform.GetChild(1).GetComponent<Text>().text = _items[i].GetQuantity().ToString();
@@ -73,7 +73,7 @@ public class InventoryManagerpredragging : MonoBehaviour
         //items.Add (item);
         //check if invenotry contains item
         SlotClass slot = Contains(item);
-        if (slot != null && slot.GetItem().isStackable)
+        if (slot != null && slot.item.isStackable)
         {//if yes we add +1
             slot.AddQuantity(1);
         }
@@ -94,7 +94,7 @@ public class InventoryManagerpredragging : MonoBehaviour
         SlotClass temp = Contains(item);
         if (temp != null)
         {//if yes we add +1
-            if (temp.GetQuantity() > 1)
+            if (temp.quantity > 1)
             {//if we have more of this item in inventory
                 temp.SubQuantity(1);
             }
@@ -104,7 +104,7 @@ public class InventoryManagerpredragging : MonoBehaviour
                 SlotClass slotToRemove = new SlotClass();
                 foreach (SlotClass slot in items)
                 {
-                    if (slot.GetItem() == item)
+                    if (slot.item == item)
                     {
                         slotToRemove = slot;
                         break;
@@ -125,7 +125,7 @@ public class InventoryManagerpredragging : MonoBehaviour
     {
         foreach (SlotClass slot in items)
         {
-            if (slot.GetItem() == item)
+            if (slot.item == item)
                 return slot;
         }
         return null;

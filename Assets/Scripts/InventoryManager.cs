@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -73,10 +75,10 @@ public class InventoryManager : MonoBehaviour
         _itemCursor.transform.position=Input.mousePosition;
         if (isMovingItem)
         {
-            _itemCursor.GetComponent<Image>().sprite = _movingSlot.GetItem().itemIcon;
+            _itemCursor.GetComponent<Image>().sprite = _movingSlot.item.itemIcon;
         }
 #endregion
-        if (Input.GetMouseButtonDown(0))//we clicked down
+        if (Input.GetMouseButtonDown(0))//we left clicked down
         { //find closest slot - could be done as Onclick event on slot
             //cant use this debug will cause null reference and wont work
             //when clicked not on slot while moving
@@ -92,6 +94,20 @@ public class InventoryManager : MonoBehaviour
                 BeginItemMove();
             }
         }
+        else if (Input.GetMouseButton(1))//rightclick
+        {
+            if (isMovingItem)
+            {   //when rightclick while holding item we put down 5 of stack
+                EndItemMove_Single();
+                //endItemMove
+            }
+            else
+            {  // when righclick and not holding item pick half of stack
+
+                BeginItemMove_Half();
+            }
+        }
+
     }
     #region Inventory Utilities
     public void RefreshUI()
@@ -103,10 +119,10 @@ public class InventoryManager : MonoBehaviour
                 //everytime child is image
                 //child on position 0 i guess; it will set sprite as item icon
                 _slots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
-                _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = _items[i].GetItem().itemIcon;
-                if (_items[i].GetItem().isStackable)
+                _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = _items[i].item.itemIcon;
+                if (_items[i].item.isStackable)
                 {
-                    _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = _items[i].GetQuantity() + "";//***************
+                    _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = _items[i].quantity + "";//***************
                 }
                 else { _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = ""; }
                 // this was above he changed it for some reason _slots[i].transform.GetChild(1).GetComponent<Text>().text = _items[i].GetQuantity().ToString();
@@ -120,21 +136,21 @@ public class InventoryManager : MonoBehaviour
             }
         }
     }
-
+    #endregion Inventory Utilities 
     public bool Add(ItemClass item, int quantity)
     {
         //items.Add (item);
         //check if invenotry contains item
         SlotClass slot = Contains(item);
-        if (slot != null&&slot.GetItem().isStackable)
+        if (slot != null&&slot.item.isStackable)
         {//if yes we add +1
-            slot.AddQuantity(1);
+            slot.AddQuantity(quantity);
         }
         else
         {//check whole array
             for (int i = 0; i < _items.Length; i++)
             {
-                if (_items[i].GetItem() == null)//this is empty slot
+                if (_items[i].item == null)//this is empty slot
                 {
                     _items[i].AddItem(item, quantity);
                     break;
@@ -145,12 +161,12 @@ public class InventoryManager : MonoBehaviour
         RefreshUI();
         return true;//yes we succesfully added the item
     }
-    public bool Remove(ItemClass item)
+    public bool Remove(ItemClass item, int quantity =1)
     {
         SlotClass temp = Contains(item);
         if (temp != null)
         {//if yes we add +1
-            if (temp.GetQuantity() > 1)
+            if (temp.quantity > 1)
             {//if we have more of this item in inventory
                 temp.SubQuantity(1);
                 //Debug.Log("item removed");
@@ -160,7 +176,7 @@ public class InventoryManager : MonoBehaviour
                 int slotToRemoveIndex = 0;
                 for (int i=0; i<_items.Length;i++)
                 {
-                    if (_items[i].GetItem()==item)
+                    if (_items[i].item==item)
                     {
                         slotToRemoveIndex = i;
                         break;
@@ -176,27 +192,35 @@ public class InventoryManager : MonoBehaviour
         RefreshUI();
         return true;
     }
+    public void UseSelected()
+    {
+        
+    }
+    public bool IsFull()
+    {
 
-        public SlotClass Contains(ItemClass item)
+        return false;
+    }
+    public SlotClass Contains(ItemClass item)
     {
         for (int  i=0; i < _items.Length;i++) 
         {
             //Debug.Log(_items[i]);
-            if (_items[i].GetItem() == item)
+            if (_items[i].item == item)
             { 
                 return _items[i]; 
             }
         }
         return null;
     }
-    #endregion Inventory Utilities 
+    
 
     #region Moving Stuff
     private bool BeginItemMove()
     {
         //_originalSlot = new SlotClass(GetClosestSlot());
         _originalSlot = GetClosestSlot();
-        if (_originalSlot == null || _originalSlot.GetItem() == null)
+        if (_originalSlot == null || _originalSlot.item == null)
             return false;//no item to move
        
         
@@ -205,26 +229,43 @@ public class InventoryManager : MonoBehaviour
             isMovingItem = true;
             RefreshUI();
             return true;
-        
+    }
+    private bool BeginItemMove_Half()
+    {//move half of stack roundUp
+        //_originalSlot = new SlotClass(GetClosestSlot());
+        _originalSlot = GetClosestSlot();
+        if (_originalSlot == null || _originalSlot.item == null)
+            return false;//no item to move
+        //we will use constructor with defyning quantity
+        _movingSlot = new SlotClass(_originalSlot.item,Mathf.CeilToInt(_originalSlot.quantity/2f));//will roundup
+        _originalSlot.SubQuantity(Mathf.CeilToInt(_originalSlot.quantity / 2f));
+        isMovingItem = true;
+        RefreshUI();
+        return true;
     }
     private bool EndItemMove() 
     {
         _originalSlot=GetClosestSlot();
 
+        if (_originalSlot == null || _originalSlot.item == null)
+            return false;//if we click offi nventory to drop we wont drop item
+        //also when we click on slot with other item we wont drop it there
+
+
         if (_originalSlot == null)
         {//if we are moving item but click not on slot return item to original slot
-            Add(_movingSlot.GetItem(), _movingSlot.GetQuantity());
+            Add(_movingSlot.item, _movingSlot.quantity);
             _movingSlot.Clear();
         }
         else
         {
-            if (_originalSlot.GetItem() != null)
+            if (_originalSlot.item != null)
             {//if item is already existing there
-                if (_originalSlot.GetItem() == _movingSlot.GetItem()) //they are same item they should stack
+                if (_originalSlot.item == _movingSlot.item) //they are same item they should stack
                 {//if they are same stack combine them
-                    if (_originalSlot.GetItem().isStackable)
+                    if (_originalSlot.item.isStackable)
                     {
-                        _originalSlot.AddQuantity(_movingSlot.GetQuantity());
+                        _originalSlot.AddQuantity(_movingSlot.quantity);
                         _movingSlot.Clear();
                     }
                     else { return false; }
@@ -232,8 +273,8 @@ public class InventoryManager : MonoBehaviour
                 else
                 {//they not same item - we will swap
                     _tempSlot = new SlotClass(_originalSlot);
-                    _originalSlot.AddItem(_movingSlot.GetItem(), _movingSlot.GetQuantity());
-                    _movingSlot.AddItem(_tempSlot.GetItem(), _tempSlot.GetQuantity());
+                    _originalSlot.AddItem(_movingSlot.item, _movingSlot.quantity);
+                    _movingSlot.AddItem(_tempSlot.item, _tempSlot.quantity);
                     RefreshUI();
                     return true;
                 }
@@ -241,11 +282,53 @@ public class InventoryManager : MonoBehaviour
             else
             {
                 //place as usual
-                _originalSlot.AddItem(_movingSlot.GetItem(), _movingSlot.GetQuantity());
+                _originalSlot.AddItem(_movingSlot.item, _movingSlot.quantity);
                 _movingSlot.Clear();
             }
         }
         isMovingItem=false;
+        RefreshUI();
+        return true;
+    }
+    private bool EndItemMove_Single()
+    {
+        _originalSlot = GetClosestSlot();
+
+        if (_originalSlot == null)
+        {//if we are moving item but click not on slot return item to original slot
+            Add(_movingSlot.item, _movingSlot.quantity);
+            _movingSlot.Clear();
+        }
+        else
+        {
+            if (_originalSlot.item != null)
+            {//if item is already existing there
+                if (_originalSlot.item == _movingSlot.item) //they are same item they should stack
+                {//if they are same stack combine them
+                    if (_originalSlot.item.isStackable)
+                    {
+                        _originalSlot.AddQuantity(_movingSlot.quantity);
+                        _movingSlot.Clear();
+                    }
+                    else { return false; }
+                }
+                else
+                {//they not same item - we will swap
+                    _tempSlot = new SlotClass(_originalSlot);
+                    _originalSlot.AddItem(_movingSlot.item, _movingSlot.quantity);
+                    _movingSlot.AddItem(_tempSlot.item, _tempSlot.quantity);
+                    RefreshUI();
+                    return true;
+                }
+            }
+            else
+            {
+                //place as usual
+                _originalSlot.AddItem(_movingSlot.item, _movingSlot.quantity);
+                _movingSlot.Clear();
+            }
+        }
+        isMovingItem = false;
         RefreshUI();
         return true;
     }
