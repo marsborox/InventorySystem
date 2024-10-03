@@ -94,7 +94,7 @@ public class InventoryManager : MonoBehaviour
                 BeginItemMove();
             }
         }
-        else if (Input.GetMouseButton(1))//rightclick
+        else if (Input.GetMouseButtonDown(1))//rightclick
         {
             if (isMovingItem)
             {   //when rightclick while holding item we put down 5 of stack
@@ -237,8 +237,14 @@ public class InventoryManager : MonoBehaviour
         if (_originalSlot == null || _originalSlot.item == null)
             return false;//no item to move
         //we will use constructor with defyning quantity
+
+
         _movingSlot = new SlotClass(_originalSlot.item,Mathf.CeilToInt(_originalSlot.quantity/2f));//will roundup
         _originalSlot.SubQuantity(Mathf.CeilToInt(_originalSlot.quantity / 2f));
+
+        if (_originalSlot.quantity == 0)
+        { _originalSlot.Clear(); }//if picking last item w rightclick pick all
+
         isMovingItem = true;
         RefreshUI();
         return true;
@@ -247,7 +253,7 @@ public class InventoryManager : MonoBehaviour
     {
         _originalSlot=GetClosestSlot();
 
-        if (_originalSlot == null || _originalSlot.item == null)
+        if (_originalSlot == null)
             return false;//if we click offi nventory to drop we wont drop item
         //also when we click on slot with other item we wont drop it there
 
@@ -295,40 +301,32 @@ public class InventoryManager : MonoBehaviour
         _originalSlot = GetClosestSlot();
 
         if (_originalSlot == null)
-        {//if we are moving item but click not on slot return item to original slot
-            Add(_movingSlot.item, _movingSlot.quantity);
-            _movingSlot.Clear();
+        {
+            return true;//no item to move
+        }
+        if (_originalSlot.item != null && _originalSlot.item != _movingSlot.item)
+        {//in case we rightclick on different item
+            return false;
+        }
+        if (_originalSlot.item != null && _originalSlot.item == _movingSlot.item)
+        {
+            _originalSlot.AddQuantity(1);
         }
         else
         {
-            if (_originalSlot.item != null)
-            {//if item is already existing there
-                if (_originalSlot.item == _movingSlot.item) //they are same item they should stack
-                {//if they are same stack combine them
-                    if (_originalSlot.item.isStackable)
-                    {
-                        _originalSlot.AddQuantity(_movingSlot.quantity);
-                        _movingSlot.Clear();
-                    }
-                    else { return false; }
-                }
-                else
-                {//they not same item - we will swap
-                    _tempSlot = new SlotClass(_originalSlot);
-                    _originalSlot.AddItem(_movingSlot.item, _movingSlot.quantity);
-                    _movingSlot.AddItem(_tempSlot.item, _tempSlot.quantity);
-                    RefreshUI();
-                    return true;
-                }
-            }
-            else
-            {
-                //place as usual
-                _originalSlot.AddItem(_movingSlot.item, _movingSlot.quantity);
-                _movingSlot.Clear();
-            }
+            _originalSlot.AddItem(_movingSlot.item, 1);
         }
-        isMovingItem = false;
+        _movingSlot.SubQuantity(1);//we remove from moving slot AFTER we placed it elsewhere
+        if (_movingSlot.quantity < 1)//in case we ran out ofi tems in hand
+        {
+            isMovingItem = false;
+            _movingSlot.Clear();
+            //return true;
+        }
+        else
+        {
+            isMovingItem = true;
+        }
         RefreshUI();
         return true;
     }
@@ -343,8 +341,6 @@ public class InventoryManager : MonoBehaviour
         }
         return null;
     }
-
-
     #endregion
 }
 
