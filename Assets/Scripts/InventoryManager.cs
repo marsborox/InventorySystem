@@ -10,6 +10,7 @@ public class InventoryManager : MonoBehaviour
 {
     [SerializeField] private GameObject _itemCursor;
     [SerializeField] private GameObject _slotHolder;
+    [SerializeField] private GameObject _hotbarSlotHolder;
     [SerializeField] private ItemClass _itemToAdd;
     [SerializeField] private ItemClass _itemToRemove;
 
@@ -24,6 +25,7 @@ public class InventoryManager : MonoBehaviour
 
     //this array keep track of slots
     private GameObject[] _slots;
+    private GameObject[] _hotbarSlots;
 
     //SF only for torubleshooting
     [SerializeField] private SlotClass _movingSlot;
@@ -32,22 +34,31 @@ public class InventoryManager : MonoBehaviour
 
     [SerializeField] bool isMovingItem;
 
+    [SerializeField] private GameObject _hotbarSelector;
+    [SerializeField] private int _selectedSlotIndex = 0;
+    public ItemClass selectedItem;
 
     private void Start()
     {
         _slots = new GameObject[_slotHolder.transform.childCount];
         _items = new SlotClass[_slots.Length];
-        
+
+        _hotbarSlots = new GameObject[_hotbarSlotHolder.transform.childCount];
+
 
 
         //set all the slots
         //this is if we dont want starting items explicitly
-
+        for (int i = 0; i < _hotbarSlots.Length; i++)
+        {
+            _hotbarSlots[i] = _hotbarSlotHolder.transform.GetChild(i).gameObject;
+        }
         //initialise slots
         for (int i = 0; i < _items.Length; i++)
         {
             _items[i]=new SlotClass();
         }
+
         //starting items into inventory
         for (int i = 0; i < _startingItems.Length; i++)
         {
@@ -108,6 +119,16 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
+        if (Input.GetAxis("Mouse ScrollWheel")>0)//scroll up
+        {
+            _selectedSlotIndex = Mathf.Clamp(_selectedSlotIndex + 1,0,_hotbarSlots.Length-1);
+        }
+        else if(Input.GetAxis("Mouse ScrollWheel") < 0)//scroll down
+        {
+            _selectedSlotIndex = Mathf.Clamp(_selectedSlotIndex - 1, 0, _hotbarSlots.Length-1);
+        }
+        _hotbarSelector.transform.position = _hotbarSlots[_selectedSlotIndex].transform.position;
+        selectedItem = _items [_selectedSlotIndex + (_hotbarSlots.Length * 3)].item;//3 here is how many rows including 0
     }
     #region Inventory Utilities
     public void RefreshUI()
@@ -133,6 +154,33 @@ public class InventoryManager : MonoBehaviour
                 _slots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;//no item
                 _slots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;//get rid of white image
                 _slots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";//*****************
+            }
+        }
+        RefreshHotbar();
+    }
+    public void RefreshHotbar()
+    {//3 is number of rows - must be done better
+        for (int i = 0; i < _hotbarSlots.Length; i++)
+        {
+            try
+            {
+                //everytime child is image
+                //child on position 0 i guess; it will set sprite as item icon
+                _hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true;
+                _hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = _items[i+ (_hotbarSlots.Length*3)].item.itemIcon;
+
+                if (_items[i + (_hotbarSlots.Length * 3)].item.isStackable)
+                {
+                    _hotbarSlots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = _items[i + (_hotbarSlots.Length * 3)].quantity + "";//***************
+                }
+                else { _hotbarSlots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = ""; }
+                
+            }
+            catch
+            {//either no item in slot or outside of index array
+                _hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;//no item
+                _hotbarSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;//get rid of white image
+                _hotbarSlots[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";//*****************
             }
         }
     }
@@ -308,6 +356,11 @@ public class InventoryManager : MonoBehaviour
         {//in case we rightclick on different item
             return false;
         }
+        if(_originalSlot.item !=null&&_originalSlot.item !=_movingSlot.item) 
+        {
+            return false;
+        }
+        _movingSlot.SubQuantity(1);
         if (_originalSlot.item != null && _originalSlot.item == _movingSlot.item)
         {
             _originalSlot.AddQuantity(1);
@@ -316,7 +369,7 @@ public class InventoryManager : MonoBehaviour
         {
             _originalSlot.AddItem(_movingSlot.item, 1);
         }
-        _movingSlot.SubQuantity(1);//we remove from moving slot AFTER we placed it elsewhere
+        //_movingSlot.SubQuantity(1);//we remove from moving slot AFTER we placed it elsewhere
         if (_movingSlot.quantity < 1)//in case we ran out ofi tems in hand
         {
             isMovingItem = false;
