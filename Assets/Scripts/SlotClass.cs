@@ -39,12 +39,15 @@ public class SlotClass
     {
         this.item = null;
         this.quantity = 0;
-    
     }
     //public ItemClass GetItem () { return item; } //in other script its replaced by "item" and "quantity"
     //public int GetQuantity () { return quantity;} //not needed anymore he changed it by setting it to public
     public void AddQuantity(int quantity) { this.quantity += quantity; }
-    public void SubQuantity(int quantity) { this.quantity -= quantity; }
+    public void SubQuantity(int quantity) 
+    {
+        this.quantity -= quantity;
+        if (this.quantity <= 0) { Clear();}
+    }
     public void AddItem(ItemClass item, int quantity) 
     {
         this.item= item;

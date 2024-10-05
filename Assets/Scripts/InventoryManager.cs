@@ -121,11 +121,11 @@ public class InventoryManager : MonoBehaviour
 
         if (Input.GetAxis("Mouse ScrollWheel")>0)//scroll up
         {
-            _selectedSlotIndex = Mathf.Clamp(_selectedSlotIndex + 1,0,_hotbarSlots.Length-1);
+            _selectedSlotIndex = Mathf.Clamp(_selectedSlotIndex - 1,0,_hotbarSlots.Length-1);
         }
         else if(Input.GetAxis("Mouse ScrollWheel") < 0)//scroll down
         {
-            _selectedSlotIndex = Mathf.Clamp(_selectedSlotIndex - 1, 0, _hotbarSlots.Length-1);
+            _selectedSlotIndex = Mathf.Clamp(_selectedSlotIndex + 1, 0, _hotbarSlots.Length-1);
         }
         _hotbarSelector.transform.position = _hotbarSlots[_selectedSlotIndex].transform.position;
         selectedItem = _items [_selectedSlotIndex + (_hotbarSlots.Length * 3)].item;//3 here is how many rows including 0
@@ -240,9 +240,11 @@ public class InventoryManager : MonoBehaviour
         RefreshUI();
         return true;
     }
+
     public void UseSelected()
     {
-        
+        _items[_selectedSlotIndex + (_hotbarSlots.Length * 3)].SubQuantity(1);
+        RefreshUI();
     }
     public bool IsFull()
     {

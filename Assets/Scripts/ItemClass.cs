@@ -1,8 +1,9 @@
 using System.Collections;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 using UnityEngine;
 
-public abstract class ItemClass : ScriptableObject
+public class ItemClass : ScriptableObject
 {//abstract class
     //data shared across every item
     [Header("Item")]
@@ -13,8 +14,12 @@ public abstract class ItemClass : ScriptableObject
 
     public int stackSize = 64;//set 64 to all items by default, can be changed in inspector for each item
     //public SlotType slotType;
-    public abstract ItemClass GetItem();
-    public abstract ToolClass GetTool();
-    public abstract MiscClass GetMiscClass();
-    public abstract ConsumableClass GetConsumableClass();
+    public virtual ItemClass GetItem() { return this; }
+    public virtual ToolClass GetTool() { return null; }
+    public virtual MiscClass GetMiscClass() { return null; }
+    public virtual ConsumableClass GetConsumableClass() { return null; }
+    public virtual void UseItem(PlayerController caller)
+    {
+        Debug.Log("Used Item");
+    }
 }

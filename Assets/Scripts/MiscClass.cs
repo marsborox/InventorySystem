@@ -6,9 +6,12 @@ using UnityEngine;
 public class MiscClass : ItemClass
 {
     //specific data to misc
-    public override ItemClass GetItem() { return this; }
-    public override ToolClass GetTool() { return null; }
-    
+  
     public override MiscClass GetMiscClass() { return this; }
-    public override ConsumableClass GetConsumableClass() { return null; }
+
+    public override void UseItem(PlayerController caller)
+    {
+        //base.UseItem(caller);
+        Debug.Log("Misc item does not do anything");
+    }
 }

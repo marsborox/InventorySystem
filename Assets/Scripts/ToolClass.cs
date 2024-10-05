@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "new Tool Class", menuName = "Item/Tool")]
+[CreateAssetMenu(fileName = "new Tool Class", menuName = "Item/Tool/Tool")]
 public class ToolClass : ItemClass
 {
     
@@ -16,9 +16,12 @@ public class ToolClass : ItemClass
         hammer,
         axe
     }
-    public override ItemClass GetItem() { return this; }
+    
     public override ToolClass GetTool() { return this; }
     //cant return this
-    public override MiscClass GetMiscClass() { return null; }
-    public override ConsumableClass GetConsumableClass() { return null; }
+    public override void UseItem(PlayerController caller)
+    {//this will call original method and do this stuff
+        base.UseItem(caller);
+        Debug.Log("Swing TOOL");
+    }
 }
