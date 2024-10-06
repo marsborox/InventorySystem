@@ -1569,6 +1569,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 995a656e93d69754c84f855821970f7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _craftingRecipes:
+  - {fileID: 11400000, guid: 03afca6b4ebae044e9503f5382b7dd02, type: 2}
   _itemCursor: {fileID: 707082708}
   _slotHolder: {fileID: 1706305138}
   _hotbarSlotHolder: {fileID: 541744248}
@@ -1578,11 +1580,15 @@ MonoBehaviour:
   - <item>k__BackingField: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
     <quantity>k__BackingField: 10
   - <item>k__BackingField: {fileID: 11400000, guid: 1a9a8d8f871d32045955b4fd33d9237a, type: 2}
-    <quantity>k__BackingField: 5
+    <quantity>k__BackingField: 20
   - <item>k__BackingField: {fileID: 11400000, guid: a62292a35e5f54a48893162a6260f702, type: 2}
     <quantity>k__BackingField: 1
   - <item>k__BackingField: {fileID: 11400000, guid: 17d3fc02d9bd9644092fd6bfac1ca051, type: 2}
     <quantity>k__BackingField: 1
+  - <item>k__BackingField: {fileID: 11400000, guid: b0946b773744e2e42a8161d940c12a7b, type: 2}
+    <quantity>k__BackingField: 20
+  - <item>k__BackingField: {fileID: 11400000, guid: b40724207e123ab448efba2373d92d29, type: 2}
+    <quantity>k__BackingField: 20
   _movingSlot:
     <item>k__BackingField: {fileID: 0}
     <quantity>k__BackingField: 0
@@ -2540,7 +2546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.78431374, g: 0.63529414, b: 0.40392157, a: 1}
+  m_Color: {r: 0.40392157, g: 0.7591578, b: 0.78431374, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

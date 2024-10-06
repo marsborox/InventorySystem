@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using TMPro;
+
+using UnityEditor.Experimental.GraphView;
+
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour
 {
+    [SerializeField] private List<CraftingRecipeClass> _craftingRecipes = new List<CraftingRecipeClass>();
     [SerializeField] private GameObject _itemCursor;
     [SerializeField] private GameObject _slotHolder;
     [SerializeField] private GameObject _hotbarSlotHolder;
@@ -80,6 +84,11 @@ public class InventoryManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.C))//handle crafting
+        {
+            Craft(_craftingRecipes[0]);//so craft first recipe in _craftingRecipes list
+        }
+
 #region have item visible when moving
 
         _itemCursor.SetActive(isMovingItem);
@@ -129,6 +138,16 @@ public class InventoryManager : MonoBehaviour
         }
         _hotbarSelector.transform.position = _hotbarSlots[_selectedSlotIndex].transform.position;
         selectedItem = _items [_selectedSlotIndex + (_hotbarSlots.Length * 3)].item;//3 here is how many rows including 0
+    }
+    private void Craft(CraftingRecipeClass recipe)
+    {
+        //if we can craft from this inventory
+        if (recipe.CanCraft(this))
+        //craft into this inventory
+        { recipe.Craft(this); }
+
+
+        else{ Debug.Log("Cant Craft that item"); }
     }
     #region Inventory Utilities
     public void RefreshUI()
@@ -209,7 +228,7 @@ public class InventoryManager : MonoBehaviour
         RefreshUI();
         return true;//yes we succesfully added the item
     }
-    public bool Remove(ItemClass item, int quantity =1)
+    public bool Remove(ItemClass item)
     {
         SlotClass temp = Contains(item);
         if (temp != null)
@@ -241,15 +260,58 @@ public class InventoryManager : MonoBehaviour
         return true;
     }
 
+    public bool Remove(ItemClass item, int quantity)
+    {
+        SlotClass temp = Contains(item);
+        if (temp != null)
+        {//if yes we add +1
+            if (temp.quantity > 1)//for some reason he kept 1 isntead of quantity
+            {//if we have more of this item in inventory
+                temp.SubQuantity(quantity);
+                //Debug.Log("item removed");
+            }
+            else
+            {
+                int slotToRemoveIndex = 0;
+                for (int i = 0; i < _items.Length; i++)
+                {
+                    if (_items[i].item == item)
+                    {
+                        slotToRemoveIndex = i;
+                        break;
+                    }
+                }
+                _items[slotToRemoveIndex].Clear();
+            }
+        }
+        else
+        {//if we dont have that item in inventory
+            return false;
+        }
+        RefreshUI();
+        return true;
+    }
+
     public void UseSelected()
     {
         _items[_selectedSlotIndex + (_hotbarSlots.Length * 3)].SubQuantity(1);
         RefreshUI();
     }
+
     public bool IsFull()
     {
-
-        return false;
+        //need this so when inventory full we cant craft more or take more items
+        for (int i = 0; i < _items.Length; i++)
+        {//if we have empty / availible slot return false (not full),
+         //else wil lreturn true-inventory full
+            if (_items[i].item==null)
+            {
+                Debug.Log("Inventory is not full");
+                return false;
+            }
+        }
+        Debug.Log("Inventory is full");
+        return true;
     }
     public SlotClass Contains(ItemClass item)
     {
@@ -263,7 +325,18 @@ public class InventoryManager : MonoBehaviour
         }
         return null;
     }
-    
+    public bool Contains(ItemClass item, int quantity)
+    {
+        for (int i = 0; i < _items.Length; i++)
+        {
+            //Debug.Log(_items[i]);
+            if (_items[i].item == item && _items[i].quantity >=quantity)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     #region Moving Stuff
     private bool BeginItemMove()
