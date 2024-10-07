@@ -15,3 +15,4 @@ MonoBehaviour:
   itemName: Coal
   itemIcon: {fileID: 21300000, guid: 8a2654759682b10429dd812abc078764, type: 3}
   isStackable: 1
+  stackSize: 64

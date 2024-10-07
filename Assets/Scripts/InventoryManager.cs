@@ -62,16 +62,17 @@ public class InventoryManager : MonoBehaviour
         {
             _items[i]=new SlotClass();
         }
-
-        //starting items into inventory
-        for (int i = 0; i < _startingItems.Length; i++)
-        {
-            _items[i] = _startingItems[i];
-        }
         //set all slots
         for (int i = 0; i < _slotHolder.transform.childCount; i++)
         {
             _slots[i]=_slotHolder.transform.GetChild(i).gameObject;
+        }
+
+        //starting items into inventory
+        for (int i = 0; i < _startingItems.Length; i++)
+        {
+            //_items[i] = _startingItems[i];
+            Add(_startingItems[i].item, _startingItems[i].quantity);
         }
 
         RefreshUI();
@@ -79,7 +80,7 @@ public class InventoryManager : MonoBehaviour
 
         //just for testing
         Add(_itemToAdd,1);
-        Remove(_itemToRemove);
+        //Remove(_itemToRemove);
     }
 
     private void Update()
@@ -209,9 +210,23 @@ public class InventoryManager : MonoBehaviour
         //items.Add (item);
         //check if invenotry contains item
         SlotClass slot = Contains(item);
-        if (slot != null&&slot.item.isStackable)
-        {//if yes we add +1
-            slot.AddQuantity(quantity);
+        //if (slot != null&&slot.item.isStackable)***
+        if (slot != null)
+        {
+            
+            //going to add 20 items
+            //there already5 max stack size is less than 25
+            //from ammount we want to add we msut like divide for huw much we can add and take rest
+            //and try to add it again
+            //               woud be lets say 16-5 =11 we can add and
+            var quantityCanAdd = slot.item.stackSize- slot.quantity;
+            var quantityToAdd=Mathf.Clamp(quantity,0,quantityCanAdd);
+            var remainder = quantity - quantityCanAdd;
+            slot.AddQuantity(quantityToAdd);
+            if (remainder > 0)
+            {
+                Add(item, remainder);
+            }
         }
         else
         {//check whole array
@@ -219,11 +234,20 @@ public class InventoryManager : MonoBehaviour
             {
                 if (_items[i].item == null)//this is empty slot
                 {
-                    _items[i].AddItem(item, quantity);
+                    //some troubleshooting attempt prob not work
+                    var quantityCanAdd = item.stackSize - _items[i].quantity;
+                    var quantityToAdd = Mathf.Clamp(quantity, 0, quantityCanAdd);
+                    var remainder = quantity - quantityCanAdd;
+                     
+                    _items[i].AddItem(item, quantityToAdd);
+                    if (remainder > 0)
+                    {
+                        Add(item, remainder);
+                    }
+                    //_items[i].AddItem(item, quantity);
                     break;
                 }
             }
-            
         }
         RefreshUI();
         return true;//yes we succesfully added the item
@@ -318,7 +342,9 @@ public class InventoryManager : MonoBehaviour
         for (int  i=0; i < _items.Length;i++) 
         {
             //Debug.Log(_items[i]);
-            if (_items[i].item == item)
+            //if (_items[i].item == item)//***
+            //will return slot if has enough room and item is stackable
+            if (_items[i].item == item&& _items[i].item.isStackable && _items[i].quantity < _items[i].item.stackSize)//****
             { 
                 return _items[i]; 
             }
@@ -392,10 +418,19 @@ public class InventoryManager : MonoBehaviour
             {//if item is already existing there
                 if (_originalSlot.item == _movingSlot.item) //they are same item they should stack
                 {//if they are same stack combine them
-                    if (_originalSlot.item.isStackable)
+                    if (_originalSlot.item.isStackable && _originalSlot.quantity < _originalSlot.item.stackSize)//***
                     {
-                        _originalSlot.AddQuantity(_movingSlot.quantity);
-                        _movingSlot.Clear();
+                        var quantityCanAdd = _originalSlot.item.stackSize - _originalSlot.quantity;
+                        var remainder = _movingSlot.quantity-quantityCanAdd;
+                        _originalSlot.AddQuantity(quantityCanAdd);
+                        if (remainder <= 0)
+                        {
+                            _movingSlot.Clear();
+                        }
+                        else 
+                        { 
+                            _movingSlot.SubQuantity(quantityCanAdd);
+                        }
                     }
                     else { return false; }
                 }

@@ -1578,7 +1578,7 @@ MonoBehaviour:
   _itemToRemove: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
   _startingItems:
   - <item>k__BackingField: {fileID: 11400000, guid: c3fe2a4a0f7a40a489e61bf81605e4fb, type: 2}
-    <quantity>k__BackingField: 10
+    <quantity>k__BackingField: 31
   - <item>k__BackingField: {fileID: 11400000, guid: 1a9a8d8f871d32045955b4fd33d9237a, type: 2}
     <quantity>k__BackingField: 20
   - <item>k__BackingField: {fileID: 11400000, guid: a62292a35e5f54a48893162a6260f702, type: 2}
